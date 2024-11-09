@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>English Movies</title>
+        <meta property="og:title" content="Movies" />
+        <meta
+            property="og:description"
+            content="Watch all of the movies from Sekolah Mondial 23-24, Website by Cai winson"
+        />
+        <meta property="og:image" content="/Collage.jpg"/>
+        <link
+            rel="icon"
+            href="/logo.ico"
+            type="image/x-icon"
+        />
+
+        <style>
+            body {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                background-color: #f0f0f0;
+            }
+            #movie-container {
+                width: 100%;
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            .movie {
+                width: calc(50% - 20px);
+                border: 1px solid #333;
+                margin: 10px;
+                padding: 10px;
+                box-sizing: border-box;
+                background-color: #fff;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                transition: transform 0.2s ease-in-out;
+                opacity: 0;
+                transform: translateY(20px);
+                animation: fadeInUp 0.5s ease-out forwards;
+                cursor: pointer; /* Add cursor pointer to indicate it's clickable */
+            }
+            .movie:hover {
+                transform: scale(1.1);
+            }
+            .movie .thumbnail img {
+                width: 100%;
+            }
+            .movie p {
+                margin: 5px 0;
+                font-size: 16px;
+            }
+            h1 {
+                text-align: center;
+                font-size: 24px;
+                margin-top: 20px;
+            }
+
+            @keyframes fadeInUp {
+                0% {
+                    opacity: 0;
+                    transform: translateY(-20px);
+                }
+                100% {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            @media (orientation: portrait) {
+                .movie {
+                    width: 100%;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <h1>English Movies</h1>
+        <div id="movie-container"></div>
+        <h6>View count update every 10 minutes</h6>
+        <script>
+            const videoIds = [
+                "jMhmFNPgV_s",
+                "qjerz0ejMEo",
+                "mE-u90xV8Bo",
+                "BZ3RDD-QRtg",
+                "TUB8ayiCpAQ",
+                "X81j9sI4NHc",
+                "wvQt4zbomUM",
+                "CRws2MRnGUM",
+                "tKW2phO1G3g",
+                "T_HkAtO8048",
+                "RCeYR8MLu6k",
+                "hABzANauRF4",
+                "LuGYwC0SuMg",
+                "lR6XkNH_CaU",
+                "EsvLGhnQ2PQ",
+                "0-A9OIjSu0Q"
+            ];
+
+            async function getVideoDetails(videoId) {
+                const apiKey = 'AIzaSyBl1PwPaCey1ZE4D_PIsEwHG-AKpnT4H40';  // Replace with your actual API key
+                const url = `https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics&id=${videoId}&key=${apiKey}`;
+
+                try {
+                    const response = await fetch(url);
+                    const data = await response.json();
+
+                    if (data.items && data.items.length > 0) {
+                        const videoData = data.items[0];
+                        const title = videoData.snippet.title;
+                        const thumbnail = videoData.snippet.thumbnails.maxres ? videoData.snippet.thumbnails.maxres.url : videoData.snippet.thumbnails.high.url;
+                        const viewCount = videoData.statistics.viewCount;
+
+                        return { title, thumbnail, viewCount, videoId };
+                    } else {
+                        throw new Error('Video not found');
+                    }
+                } catch (error) {
+                    console.error('Error fetching video details:', error);
+                }
+            }
+
+            function createMovieDiv(videoDetails) {
+                var movieDiv = document.createElement("div");
+                movieDiv.className = "movie";
+
+                var thumbnail = document.createElement("div");
+                thumbnail.className = "thumbnail";
+                var thumbnailImage = document.createElement("img");
+                thumbnailImage.src = videoDetails.thumbnail;
+                thumbnail.appendChild(thumbnailImage);
+
+                var title = document.createElement("p");
+                title.textContent = videoDetails.title;
+                title.style.fontWeight = "bold";
+
+                var viewCount = document.createElement("p");
+                viewCount.textContent = "View Count: " + videoDetails.viewCount;
+
+                // Add a click event listener to the movie div
+                movieDiv.addEventListener("click", function () {
+                    // Redirect to the video URL when the div is clicked
+                    window.open(`https://youtu.be/${videoDetails.videoId}`, "_blank");
+                });
+
+                movieDiv.appendChild(thumbnail);
+                movieDiv.appendChild(title);
+                movieDiv.appendChild(viewCount);
+
+                document.getElementById("movie-container").appendChild(movieDiv);
+            }
+
+            videoIds.forEach(async (videoId) => {
+                const videoDetails = await getVideoDetails(videoId);
+                if (videoDetails) {
+                    createMovieDiv(videoDetails);
+                }
+            });
+        </script>
+    </body>
+</html>
